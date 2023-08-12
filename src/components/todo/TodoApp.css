@@ -6,3 +6,9 @@ label,button,input{
 .ListTodosComponent{
     text-align: center;
 }
+
+.Footer{
+    bottom : 0;
+    position: absolute;
+    width: 90%;
+}

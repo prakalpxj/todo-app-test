@@ -1,34 +1,32 @@
-import { useState} from 'react';
-import './TodoApp.css'
-import {BrowserRouter, Route, Routes, useNavigate, useParams} from 'react-router-dom';
 
+import './TodoApp.css'
+import {BrowserRouter, Route, Routes} from 'react-router-dom';
+import LogoutComponent from './LogoutComponent';
+import LoginComponent from './LoginComponent';
+import FooterComponent from './FooterComponent';
+import HeaderComponent from './HeaderComponent';
+import WelcomeComponent from './WelcomeComponent'; 
 export default function TodoApp(){
     return (
     <div className="TodoApp">
         <BrowserRouter>
+        <HeaderComponent/>
             <Routes>
                 <Route path="/" element = {<LoginComponent/>}></Route>
                 <Route path="/login" element = {<LoginComponent/>}></Route>
                 <Route path="/welcome/:username" element = {<WelcomeComponent/>}></Route>
                 <Route path="/todos" element = {<ListTodos/>}></Route>
+                <Route path="/logout" element = {<LogoutComponent/>}></Route>
                 <Route path="*" element = {<ErrorComponent/>}></Route>
 
             </Routes>
+        <FooterComponent/>
         </BrowserRouter>
     </div>
 
     );
 }
 
-function WelcomeComponent(){
-    const {username} = useParams()   //deconstructing the object
-    return (
-        <>
-        <h1>Welcome to my todo app</h1>
-            <div className='Welcome'>Welcome {username}</div>
-        </>
-    );
-}
 
 function ErrorComponent(){
     return (
@@ -41,19 +39,24 @@ function ErrorComponent(){
 
 function ListTodos(){
 
-    const todos = [ {id:'1' , description : "Learn AWS!"} ,
-                    {id:'2' , description : "Learn DSA!"},
-                    {id:'3' , description : "Learn Azure!"}
+    const todayDate = new Date();
+    const targetDate = new Date(todayDate.getFullYear()+12, todayDate.getMonth(), todayDate.getDay());
+    const todos = [ {id:'1' , description : "Learn AWS!", done:false, targetDate : targetDate} ,
+                    {id:'2' , description : "Learn DSA!", done:false, targetDate : targetDate},
+                    {id:'3' , description : "Learn Azure!", done:false, targetDate : targetDate}
 
                   ]
     return (
-        <div className='ListTodosComponent'>
+        <div className='container'>
             <h1> Things you want to do! </h1>
-            <table>
+            <table className = 'table'>
                 <thead>
                     <tr>
                         <td>id</td>
                         <td>task</td>
+                        <td>Status</td>
+                        <td>Target Date</td>
+
                     </tr>
                 </thead>
                 <tbody>
@@ -63,7 +66,9 @@ function ListTodos(){
                            todoTask => (
                                <tr key = {todoTask.id} >
                                     <td>{todoTask.id}</td>
-                                    <td>{todoTask.description}</td> 
+                                    <td>{todoTask.description}</td>
+                                    <td>{todoTask.done.toString()}</td> 
+                                    <td>{todoTask.targetDate.toDateString()}</td>
                                 </tr>
                         ) 
                         )              
@@ -75,47 +80,3 @@ function ListTodos(){
     )
 }
 
-
-function LoginComponent(){
-
-    const [username,setUsername] = useState("prakalp-jain");
-    const [password, setPassword] = useState('');
-
-    const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-    const [showFailedMessage, setShowFailedMessage] = useState(false);
-    const navigate = useNavigate()   //useNavigate returns a reference to a function
-    function handleSubmit(){
-        if(username === "prakalp-jain" && password === "12345"){
-            setShowFailedMessage(false);
-            setShowSuccessMessage(true);
-            navigate(`/welcome/${username}`)
-        }
-        else{
-            setShowFailedMessage(true);
-            setShowSuccessMessage(false);
-        }
-    }
-
-    return (
-        <div className="Login">
-             <h1>Welcome to my todo app. Please Login.</h1>
-            <div className="LoginForm">
-                <div>
-                    <label>User Name:</label>
-                    <input type="text" name="username" value={username} onChange={(event)=> setUsername(event.target.value)}></input>
-                </div>
-                <div>
-                    <label>Password:</label>
-                    <input type="password" name="password" value={password} placeholder='Password' onChange={(event) => setPassword(event.target.value)}></input>
-                </div>
-                <button type="button" name="login" onClick={handleSubmit}>login</button>
-                { showSuccessMessage && <WelcomeComponent/> }
-                { showFailedMessage && <>Authentication Failed </>}               
-                
-            </div>
-
-
-        </div>
-
-    );
-}
