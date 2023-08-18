@@ -1,6 +1,6 @@
 import { useParams, Link} from 'react-router-dom';
 import { useState } from 'react';
-import {retrieveHelloWorldApi, retrieveTodosApi} from './api/RestApiCalls';
+import {retrieveHelloWorldApi} from './api/RestApiCalls';
 export default function WelcomeComponent(){
     
     const {username} = useParams()   //deconstructing the object
@@ -23,12 +23,12 @@ export default function WelcomeComponent(){
         console.log(error)
     }
 
-    function retrieveTodos(){
-        retrieveTodosApi(username)
-        .then((response) => response.data.map((x) => console.log(x)))
-        .catch((error) => errorResponse(error))
-        .finally(() => console.log('cleanup'))
-    }
+    // function retrieveTodos(){
+    //     retrieveTodosApi(username)
+    //     .then((response) => response.data.map((x) => console.log(x)))
+    //     .catch((error) => errorResponse(error))
+    //     .finally(() => console.log('cleanup'))
+    // }
 
 
     return (
@@ -37,7 +37,7 @@ export default function WelcomeComponent(){
             <div>Manage your <Link to="/todos">todos</Link></div>
             <button className = "btn btn-primary" onClick={callHelloWorldRestApi}>Click to call API</button>
             <div className='text-info'>{message}</div>
-            <button className = "btn btn-primary" onClick={retrieveTodos}>Click to call API</button>
+            {/* <button className = "btn btn-primary" onClick={retrieveTodos}>Click to call API</button> */}
             {/* <div className='text-info m-5'></div> */}
         </>
     );

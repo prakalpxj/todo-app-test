@@ -7,6 +7,8 @@ import FooterComponent from './FooterComponent';
 import HeaderComponent from './HeaderComponent';
 import WelcomeComponent from './WelcomeComponent'; 
 import AuthProvider, { useAuth } from '../../security/AuthContext';
+import { deleteTodoApi, retrieveAllTodosForUsernameApi } from './api/TodoApiService';
+import { useEffect, useState } from 'react';
 
 
 function AuthenticatedRoute({children}){
@@ -65,21 +67,57 @@ function ListTodos(){
 
     const todayDate = new Date();
     const targetDate = new Date(todayDate.getFullYear()+12, todayDate.getMonth(), todayDate.getDay());
-    const todos = [ {id:'1' , description : "Learn AWS!", done:false, targetDate : targetDate} ,
-                    {id:'2' , description : "Learn DSA!", done:false, targetDate : targetDate},
-                    {id:'3' , description : "Learn Azure!", done:false, targetDate : targetDate}
+    const [todos, setTodos] = useState([]);
+    const [message, setMessage] = useState(null);
+    const auth = useAuth()
+    const username = auth.username
 
-                  ]
+    function refreshTodos(){
+        // console.log(username + " todos")
+        retrieveAllTodosForUsernameApi(username)
+        .then((response) =>(
+            setTodos(response.data))
+        )
+        .catch((error) => console.log(error))
+    }
+
+    useEffect(
+        () => refreshTodos() , []
+    )
+
+    function deleteTodo(id){
+        // console.log("clicked " + id)
+        deleteTodoApi(username, id)
+        .then (
+            () => {
+                setMessage(`deleted todo with ${id}`)
+                refreshTodos()
+ 
+            }
+
+        )
+
+              
+    }
+
+
+    // const todos = [ {id:'1' , description : "Learn AWS!", done:false, targetDate : targetDate} ,
+    //                 {id:'2' , description : "Learn DSA!", done:false, targetDate : targetDate},
+    //                 {id:'3' , description : "Learn Azure!", done:false, targetDate : targetDate}
+
+    //               ]
+
     return (
         <div className='container'>
             <h1> Things you want to do! </h1>
+            {message && <div className='alert alert-warning'>{message}</div>}
             <table className = 'table'>
                 <thead>
                     <tr>
-                        <td>id</td>
-                        <td>task</td>
-                        <td>Status</td>
-                        <td>Target Date</td>
+                        <th>task</th>
+                        <th>Status</th>
+                        <th>Target Date</th>
+                        <th>Delete</th>
 
                     </tr>
                 </thead>
@@ -89,10 +127,10 @@ function ListTodos(){
                        todos.map( 
                            todoTask => (
                                <tr key = {todoTask.id} >
-                                    <td>{todoTask.id}</td>
                                     <td>{todoTask.description}</td>
                                     <td>{todoTask.done.toString()}</td> 
-                                    <td>{todoTask.targetDate.toDateString()}</td>
+                                    <td>{todoTask.targetDate.toString()}</td>
+                                    <td><button className='btn btn-warning' onClick={() => deleteTodo(todoTask.id)}>Delete</button></td>
                                 </tr>
                         ) 
                         )              
