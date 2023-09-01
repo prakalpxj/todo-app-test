@@ -1,6 +1,7 @@
 
 import './TodoApp.css'
 import {BrowserRouter, Route, Routes, Navigate} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import LogoutComponent from './LogoutComponent';
 import LoginComponent from './LoginComponent';
 import FooterComponent from './FooterComponent';
@@ -9,6 +10,7 @@ import WelcomeComponent from './WelcomeComponent';
 import AuthProvider, { useAuth } from '../../security/AuthContext';
 import { deleteTodoApi, retrieveAllTodosForUsernameApi } from './api/TodoApiService';
 import { useEffect, useState } from 'react';
+import TodoComponent from './TodoComponent';
 
 
 function AuthenticatedRoute({children}){
@@ -37,6 +39,14 @@ export default function TodoApp(){
                 <Route path="/todos" element = {
                     <AuthenticatedRoute>
                         <ListTodos/>
+                    </AuthenticatedRoute>
+                    }>
+                
+                </Route>
+
+                 <Route path="/todo/:id" element = {
+                    <AuthenticatedRoute>
+                        <TodoComponent/>
                     </AuthenticatedRoute>
                     }>
                 
@@ -71,7 +81,7 @@ function ListTodos(){
     const [message, setMessage] = useState(null);
     const auth = useAuth()
     const username = auth.username
-
+    const navigate = useNavigate()
     function refreshTodos(){
         // console.log(username + " todos")
         retrieveAllTodosForUsernameApi(username)
@@ -96,10 +106,17 @@ function ListTodos(){
             }
 
         )
-
-              
     }
 
+    function updateTodo(id){
+        // console.log("clicked " + id) 
+        navigate(`/todo/${id}`)             
+    }
+
+    function addNewTodo(){
+        
+        navigate(`/todo/-1`)             
+    }
 
     // const todos = [ {id:'1' , description : "Learn AWS!", done:false, targetDate : targetDate} ,
     //                 {id:'2' , description : "Learn DSA!", done:false, targetDate : targetDate},
@@ -118,6 +135,7 @@ function ListTodos(){
                         <th>Status</th>
                         <th>Target Date</th>
                         <th>Delete</th>
+                        <th>Update</th>
 
                     </tr>
                 </thead>
@@ -131,6 +149,7 @@ function ListTodos(){
                                     <td>{todoTask.done.toString()}</td> 
                                     <td>{todoTask.targetDate.toString()}</td>
                                     <td><button className='btn btn-warning' onClick={() => deleteTodo(todoTask.id)}>Delete</button></td>
+                                    <td><button className='btn btn-success' onClick={() =>updateTodo(todoTask.id)}>Update</button></td>
                                 </tr>
                         ) 
                         )              
@@ -138,6 +157,7 @@ function ListTodos(){
                 </tbody>
 
             </table>
+            <div className = "btn btn-success m-5" onClick={addNewTodo}>Add new todo</div>
         </div>
     )
 }
